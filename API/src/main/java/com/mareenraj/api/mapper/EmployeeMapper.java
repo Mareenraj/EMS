@@ -3,6 +3,7 @@ package com.mareenraj.api.mapper;
 import com.mareenraj.api.dto.request.CreateEmployeeRequest;
 import com.mareenraj.api.dto.response.EmployeeResponse;
 import com.mareenraj.api.entity.Employee;
+import com.mareenraj.api.entity.EmployeeStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,7 +19,7 @@ public class EmployeeMapper {
         employee.setEmail(createEmployeeRequest.email());
         employee.setJoinDate(createEmployeeRequest.joinDate());
         employee.setCurrentSalary(createEmployeeRequest.currentSalary());
-        employee.setEmployeeStatus(createEmployeeRequest.employeeStatus());
+        employee.setEmployeeStatus(EmployeeStatus.fromValue(createEmployeeRequest.employeeStatus()));
         return employee;
     }
 

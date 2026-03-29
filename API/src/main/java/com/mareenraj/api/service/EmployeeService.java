@@ -4,6 +4,8 @@ import com.mareenraj.api.dto.request.CreateEmployeeRequest;
 import com.mareenraj.api.dto.request.UpdateEmployeeRequest;
 import com.mareenraj.api.dto.response.EmployeeResponse;
 import com.mareenraj.api.entity.Employee;
+import com.mareenraj.api.entity.EmployeeStatus;
+import com.mareenraj.api.exception.EmailAlreadyUsedException;
 import com.mareenraj.api.exception.EmployeeNotFoundException;
 import com.mareenraj.api.mapper.EmployeeMapper;
 import com.mareenraj.api.repository.EmployeeRepository;
@@ -11,6 +13,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 
 @Service
@@ -26,6 +29,9 @@ public class EmployeeService {
 
     @Transactional
     public EmployeeResponse createEmployee(CreateEmployeeRequest createEmployeeRequest) {
+        if (employeeRepository.existsByEmail(createEmployeeRequest.email())) {
+            throw new EmailAlreadyUsedException(createEmployeeRequest.email() + " is already used.");
+        }
         Employee employee = employeeMapper.toEmployeeEntity(createEmployeeRequest);
         Employee savedEmployee = employeeRepository.save(employee);
         return employeeMapper.toEmployeeResponse(savedEmployee);
@@ -44,13 +50,16 @@ public class EmployeeService {
     @Transactional
     public EmployeeResponse updateEmployee(Long id, UpdateEmployeeRequest updateEmployeeRequest) {
         Employee employee = findEmployeeOrThrowAnException(id);
+        if (!Objects.equals(employee.getEmail(), updateEmployeeRequest.email()) && employeeRepository.existsByEmail(updateEmployeeRequest.email())) {
+            throw new EmailAlreadyUsedException(updateEmployeeRequest.email() + " is already used.");
+        }
         employee.setFirstName(updateEmployeeRequest.firstName());
         employee.setLastName(updateEmployeeRequest.lastName());
         employee.setAddress(updateEmployeeRequest.address());
         employee.setEmail(updateEmployeeRequest.email());
         employee.setJoinDate(updateEmployeeRequest.joinDate());
         employee.setCurrentSalary(updateEmployeeRequest.currentSalary());
-        employee.setEmployeeStatus(updateEmployeeRequest.employeeStatus());
+        employee.setEmployeeStatus(EmployeeStatus.fromValue(updateEmployeeRequest.employeeStatus()));
         return employeeMapper.toEmployeeResponse(employee);
     }
 

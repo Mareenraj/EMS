@@ -1,6 +1,5 @@
 package com.mareenraj.api.dto.request;
 
-import com.mareenraj.api.entity.EmployeeStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,7 +28,7 @@ public record CreateEmployeeRequest(
         @Positive(message = "Salary should be positive.")
         Double currentSalary,
 
-        @NotNull(message = "Employee status is required.")
-        EmployeeStatus employeeStatus
+        @NotBlank(message = "Employee status is required.")
+        String employeeStatus
 ) {
 }
